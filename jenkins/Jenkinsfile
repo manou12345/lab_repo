@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: "${params.branch_name}", url: 'https://github.com/manou12345/lab-repo.git'
+                git branch: "${params.branch_name}", url: 'https://github.com/manou12345/lab_repo.git'
             }
         }
         stage('Build') {
