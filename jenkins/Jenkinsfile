@@ -4,20 +4,40 @@ pipeline {
         // Install the Maven version configured as "M3" and add it to the path.
         maven "jenkins-maven"
     }
+    parameters {
+        string(name: 'branch_name', defaultValue: 'main', description: 'Name of the branch to build')
+    }
+
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: "${params.branch_name}", url: 'https://github.com/manou12345/lab-repo.git'
+            }
+        }
         stage('Build') {
             steps {
-                git 'https://github.com/cnsidze/java-project.git'
-                sh 'mvn -B -DskipTests clean package'
+                script {
+                    docker.build("manudocker4/jenkins_lab4:${params.branch_name}")
+                }
             }
         }
         stage('Test') {
             steps {
                 sh 'mvn test'
             }
-            post {
-                success {
-                    archiveArtifacts 'target/*.jar'
+        }
+         stage('Artifact') {
+            steps {
+                archiveArtifacts 'target/*.jar'
+            }
+        }   
+            
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    docker.withRegistry('https://hub.docker.com/', 'docker_cred') {
+                        docker.image("manudocker4/jenkins_lab4:${params.branch_name}").push()
+                    }
                 }
             }
         }
