@@ -18,6 +18,14 @@ pipeline {
                 // To run Maven on a Windows agent, use
                 // bat "mvn -Dmaven.test.failure.ignore=true clean package"
             }
+            stage('Push to DockerHub') {
+            steps {
+                script {
+                    docker.withRegistry('https://hub.docker.com/', 'docker_cred') {
+                        docker.image("manudocker4/jenkins_lab4:${params.branch_name}").push()
+                    }
+                }
+            }
             
 
             post {
